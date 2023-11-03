@@ -2,7 +2,7 @@ from rest_framework.decorators import  api_view
 from rest_framework.response import  Response
 from rest_framework import status
 from properties.models import Properties
-from properties.api.serializers import PropertySerializer
+from properties.api.serializers import PropertySerializer,PropertyModelSerializer
 
 
 
@@ -19,7 +19,7 @@ def index(request):
         return Response({'errors': serialized_property.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'GET':
-        # 1- get all objects
+        
         properties= Properties.get_all_properties()
         serialized_properties= PropertySerializer(properties, many=True)
 
@@ -49,4 +49,7 @@ def property_resource(request, id):
         return  Response({"message":"object not found , please reload the page"},
                          status=status.HTTP_205_RESET_CONTENT)
 
+    
+    
+    
     

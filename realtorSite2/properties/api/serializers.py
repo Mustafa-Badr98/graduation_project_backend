@@ -3,10 +3,12 @@
 
 from rest_framework import serializers
 from properties.models import Properties
+from users.api.serializers import UserSerializer
 # from rest_framework import validators
 
 
 class PropertySerializer(serializers.Serializer):
+    
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=100)
     description = serializers.CharField(max_length=200,required=False)
@@ -18,7 +20,7 @@ class PropertySerializer(serializers.Serializer):
     number_of_bedrooms=serializers.IntegerField(required=False)
     number_of_bathrooms=serializers.IntegerField(required=False)
     image= serializers.ImageField(required=False)
-    
+    seller=UserSerializer()
     
     
     created_at = serializers.DateTimeField(read_only=True)
@@ -27,7 +29,6 @@ class PropertySerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return  Properties.objects.create(**validated_data)
-
 
 
     def update(self, instance, validated_data):
@@ -43,3 +44,18 @@ class PropertySerializer(serializers.Serializer):
         instance.lon = validated_data['lon']
         instance.save()
         return  instance
+    
+    
+    
+    
+    
+class PropertyModelSerializer(serializers.ModelSerializer):
+    seller=UserSerializer()
+    
+    class Meta:
+        model = Properties
+        fields = '__all__'   
+    
+    
+    
+    

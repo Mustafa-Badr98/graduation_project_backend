@@ -22,7 +22,7 @@ class Properties(models.Model):
     updated_at = models.DateTimeField(auto_now=True,null=True)
     
     def __str__(self):
-        return f'{self.title} BY {self.seller.user_name}'
+        return f'{self.title} BY {self.seller}'
     
     @classmethod
     def get_all_properties(cls):

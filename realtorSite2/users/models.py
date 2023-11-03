@@ -72,17 +72,17 @@ class NewUser(AbstractBaseUser,PermissionsMixin):
 
     created_at = models.DateTimeField(auto_now_add=True,)
     updated_at = models.DateTimeField(auto_now=True,)
-    # notice the absence of a "Password field", that is built in.
+    
 
     profile_pic=models.ImageField( upload_to=user_profile_pic_path, max_length=200,null=True,blank=True)
 
-    REQUIRED_FIELDS = ['user_name','mobile_phone'] # Email & Password are required by default.
+    REQUIRED_FIELDS = ['user_name','mobile_phone'] 
     USERNAME_FIELD = 'email'
 
     objects=UsersManger()
     
     def __str__(self):
-        return f'{self.email} ::: {self.user_name}'
+        return f'{self.user_name}'
     
     @classmethod
     def get_all_users(cls):
