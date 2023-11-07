@@ -57,7 +57,7 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True,)
     updated_at = models.DateTimeField(auto_now=True,)
 
-    user_properties=models.ManyToManyField('properties.Property',related_name="user_ads")
+    user_properties = models.ManyToManyField('properties.Property',related_name="user_ads")
     favorites = models.ManyToManyField('properties.Property', related_name='favorited_by')
     ratings = models.ManyToManyField('ratings.Rating', related_name='rated_user')
      
@@ -76,6 +76,8 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     def get_all_users(cls):
         return cls.objects.all()
 
-
+    @classmethod
+    def get_specific_user(cls, email):
+        return cls.objects.filter(email=email).first()
 
 

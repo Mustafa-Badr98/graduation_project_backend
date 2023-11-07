@@ -137,3 +137,57 @@ class UserLogout(APIView):
 	def post(self, request):
 		logout(request)
 		return Response("logout succuss",status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @api_view(['GET', 'PUT', 'DELETE'])
+# @permission_classes([AllowAny])
+# def property_resource(request, id):
+#     property = Property.get_specific_property(id)
+#     if property and request.method == 'PUT':
+#         serialized_property = PropertyModelSerializerPost(
+#             data=request.data, instance=property)
+#         if serialized_property.is_valid():
+#             serialized_property.save()
+#             return Response({'property': serialized_property.data}, status=200)
+#         return Response({'errors': serialized_property.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+#     elif property and request.method == 'DELETE':
+#         property.delete()
+#         return Response({"message": "Deleted Successfully! "},
+#                         status=status.HTTP_204_NO_CONTENT)
+
+#     elif property and request.method == 'GET':
+#         serialized_property = PropertyModelSerializerGet(property)
+#         return Response({'data': serialized_property.data}, status=status.HTTP_200_OK)
+
+#     else:
+#         return Response({"message": "object not found , please reload the page"},
+#                         status=status.HTTP_205_RESET_CONTENT)
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_by_email(request, email):
+    
+    user = NewUser.get_specific_user(email)
+    if user and request.method == 'GET':
+        serialized_user = UserSerializer(user)
+        return Response({'data': serialized_user.data}, status=status.HTTP_200_OK)
+
+    else:
+        return Response({"message": "object not found , please reload the page"},
+                        status=status.HTTP_205_RESET_CONTENT)

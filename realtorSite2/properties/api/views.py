@@ -25,6 +25,7 @@ def postAd(request):
         if serialized_property.is_valid():
             serialized_property.validated_data['seller'] = user
             print(serialized_property.validated_data)
+            
             serialized_property.save()
             return Response({'properties': serialized_property.data}, status=201)
         return Response({'errors': serialized_property.errors}, status=status.HTTP_400_BAD_REQUEST)
