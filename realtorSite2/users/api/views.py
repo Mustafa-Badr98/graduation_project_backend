@@ -75,7 +75,6 @@ class UserLogin2(APIView):
     def post(self, request):
         data = request.data
         user = authenticate(username=data['email'], password=data['password'])
-
         if user is not None:
             login(request, user)
             token, created = Token.objects.get_or_create(user=user)

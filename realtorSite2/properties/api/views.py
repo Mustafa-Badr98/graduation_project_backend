@@ -9,9 +9,9 @@ from rest_framework import permissions, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-
-
-
+from rest_framework.views import APIView
+from properties.filters import PropertyFilter
+from urllib.parse import quote
 
 @api_view(['GET', 'POST'])
 @authentication_classes([TokenAuthentication])
@@ -67,3 +67,19 @@ def property_resource(request, id):
     else:
         return Response({"message": "object not found , please reload the page"},
                         status=status.HTTP_205_RESET_CONTENT)
+
+
+
+class PropertyListAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        queryset = Property.objects.all()
+
+        print(request.query_params)
+        
+        filtered_queryset = PropertyFilter(request.query_params, queryset=queryset).qs
+        print(filtered_queryset.query)
+        # print(request.query_params)
+        serializer = PropertySerializer(filtered_queryset, many=True)
+        return Response(serializer.data)
