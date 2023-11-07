@@ -2,7 +2,7 @@ from django.db import models
 from users.models import NewUser
 # Create your models here.
 
-class Properties(models.Model):
+class Property(models.Model):
     
     title=models.CharField(max_length=50,null=False)
     description=models.CharField(max_length=200,null=True,blank=True)
@@ -14,8 +14,8 @@ class Properties(models.Model):
     number_of_bedrooms=models.IntegerField(null=True)
     number_of_bathrooms=models.IntegerField(null=True)
     image=models.ImageField(upload_to='accounts/properties/images/', max_length=None,null=True,blank=True)
-    seller=models.ForeignKey(NewUser, verbose_name=("Seller User"), on_delete=models.CASCADE,null=True, blank=True
-                              ,related_name='seller')
+    seller=models.ForeignKey('users.NewUser', verbose_name=("Seller User"), on_delete=models.CASCADE,null=True, blank=True
+                              ,related_name='propertySeller')
     
     
     created_at = models.DateTimeField(auto_now_add=True, null=True)

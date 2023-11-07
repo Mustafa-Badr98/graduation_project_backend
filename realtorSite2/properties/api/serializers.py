@@ -1,9 +1,7 @@
-
-
-
 from rest_framework import serializers
-from properties.models import Properties
-from users.api.serializers import UserSerializer
+from properties.models import Property
+# from users.api.serializers3 import UserSerializer
+
 # from rest_framework import validators
 
 
@@ -20,7 +18,7 @@ class PropertySerializer(serializers.Serializer):
     number_of_bedrooms=serializers.IntegerField(required=False)
     number_of_bathrooms=serializers.IntegerField(required=False)
     image= serializers.ImageField(required=False)
-    seller=UserSerializer()
+  
     
     
     created_at = serializers.DateTimeField(read_only=True)
@@ -28,7 +26,8 @@ class PropertySerializer(serializers.Serializer):
 
 
     def create(self, validated_data):
-        return  Properties.objects.create(**validated_data)
+        print(validated_data)
+        return  Property.objects.create(**validated_data)
 
 
     def update(self, instance, validated_data):
@@ -47,15 +46,16 @@ class PropertySerializer(serializers.Serializer):
     
     
     
-    
-    
-class PropertyModelSerializer(serializers.ModelSerializer):
-    seller=UserSerializer()
-    
+class PropertyModelSerializerPost(serializers.ModelSerializer):
+
     class Meta:
-        model = Properties
+        model = Property
         fields = '__all__'   
     
     
+class FavoritePropertyModelSerializer(serializers.ModelSerializer):
     
+    class Meta:
+        model = Property
+        fields = '__all__'       
     

@@ -1,21 +1,73 @@
-
-
-
+from django.forms import ValidationError
 from rest_framework import serializers
 from users.models import NewUser
-# from rest_framework import validators
+from rest_framework import validators
+from rest_framework import serializers
+from django.contrib.auth import get_user_model, authenticate
+# from favorites.api.serializers import FavoriteSerializer
+from properties.api.serializers import FavoritePropertyModelSerializer
+from ratings.api.serializers import RatingSerializer
+from django.db.models import Avg
+
+
+UserModel = get_user_model()
+
+
+class UserRegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = '__all__'
+
+    def create(self, clean_data):
+        user_obj = UserModel.objects.create_user(
+            email=clean_data['email'], password=clean_data['password'], user_name=clean_data['user_name'])
+        user_obj.mobile_phone = clean_data['mobile']
+        user_obj.save()
+        return user_obj
+
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def check_user(self, clean_data):
+        user = authenticate(
+            username=clean_data['email'], password=clean_data['password'])
+        if not user:
+            return 0
+
+        return user
 
 
 class UserSerializer(serializers.ModelSerializer):
+    favorites = FavoritePropertyModelSerializer(many=True, read_only=True)
+    avg_rating = serializers.SerializerMethodField()
+    num_ratings = serializers.SerializerMethodField()
+
     class Meta:
-        
         model = NewUser
-        fields = '__all__'
-    
-    
-    
-    
-    
+        fields = (
+            'id',
+            'favorites',
+            'avg_rating',
+            'num_ratings',
+            'password',
+            'email',
+            'user_name',
+            'first_name',
+            'last_name',
+            'mobile_phone',
+            'profile_pic',
+        )
+
+    def get_avg_rating(self, obj):
+        avg_rating = obj.ratings.aggregate(Avg('rating'))['rating__avg']
+        return avg_rating
+
+    def get_num_ratings(self, obj):
+        num_ratings = obj.ratings.count()
+        return num_ratings
+
     # id = serializers.IntegerField(read_only=True)
     # email = serializers.EmailField(max_length=100)
     # user_name = serializers.CharField(max_length=200,required=False)
@@ -26,11 +78,8 @@ class UserSerializer(serializers.ModelSerializer):
     # created_at = serializers.DateTimeField(read_only=True)
     # updated_at = serializers.DateTimeField(read_only=True)
 
-
     # def create(self, validated_data):
     #     return  NewUser.objects.create(**validated_data)
-
-
 
     # def update(self, instance, validated_data):
     #     instance.title = validated_data['title']
