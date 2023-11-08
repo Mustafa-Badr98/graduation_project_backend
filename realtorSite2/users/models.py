@@ -23,7 +23,7 @@ class UsersManger(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, user_name, password, mobile_phone, **other_fields):
+    def create_superuser(self, email, user_name, password, **other_fields):
         """
         Creates and saves a superuser with the given email and password.
         """
@@ -38,7 +38,7 @@ class UsersManger(BaseUserManager):
         if other_fields.get('is_superuser') is not True:
             raise ValueError("super user must be assigned is_superuser = True")
 
-        return self.create_user(email, user_name, password, mobile_phone, **other_fields)
+        return self.create_user(email, user_name, password, **other_fields)
 
 
 class NewUser(AbstractBaseUser, PermissionsMixin):
@@ -51,15 +51,17 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     user_name = models.CharField(max_length=150,)
     first_name = models.CharField(max_length=150, null=True, blank=True)
     last_name = models.CharField(max_length=150, null=True, blank=True)
-    mobile_phone = models.IntegerField()
+    mobile_phone = models.IntegerField(null=True)
     profile_pic = models.ImageField(
         upload_to="accounts/profile_pics/", max_length=200, null=True, blank=True)
+    
+    
     created_at = models.DateTimeField(auto_now_add=True,)
     updated_at = models.DateTimeField(auto_now=True,)
 
-    user_properties = models.ManyToManyField('properties.Property',related_name="user_ads")
-    favorites = models.ManyToManyField('properties.Property', related_name='favorited_by')
-    ratings = models.ManyToManyField('ratings.Rating', related_name='rated_user')
+    user_properties = models.ManyToManyField('properties.Property',related_name="user_ads",null=True,blank=True)
+    favorites = models.ManyToManyField('properties.Property', related_name='favorited_by',null=True,blank=True)
+    ratings = models.ManyToManyField('ratings.Rating', related_name='rated_user',null=True,blank=True)
      
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

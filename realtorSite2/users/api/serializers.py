@@ -10,18 +10,19 @@ from ratings.api.serializers import RatingSerializer
 from django.db.models import Avg
 
 
-UserModel = get_user_model()
+# UserModel = get_user_model()
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserModel
+        model = NewUser
         fields = '__all__'
 
     def create(self, clean_data):
-        user_obj = UserModel.objects.create_user(
+        user_obj = NewUser.objects.create_user(
             email=clean_data['email'], password=clean_data['password'], user_name=clean_data['user_name'])
-        user_obj.mobile_phone = clean_data['mobile']
+        user_obj.mobile_phone = clean_data['mobile_phone']
+        user_obj.mobile_phone = clean_data['mobile_phone']
         user_obj.save()
         return user_obj
 

@@ -79,6 +79,22 @@ class UserLogin2(APIView):
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+
+
+
+
+class UserReg(APIView):
+        permission_classes = (permissions.AllowAny,)
+        authentication_classes = ()
+        def post(self, request):
+            serialized_user = UserRegisterSerializer(data=request.data)
+            if serialized_user.is_valid():
+                print(serialized_user.validated_data)   
+                serialized_user.save()
+                return Response({'user': serialized_user.data}, status=201)
+            return Response({'errors': serialized_user.errors}, status=status.HTTP_400_BAD_REQUEST)
+        
+    
 class UserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
 
