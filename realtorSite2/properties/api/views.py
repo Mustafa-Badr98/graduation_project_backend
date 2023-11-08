@@ -70,7 +70,7 @@ def property_resource(request, id):
 
 
 
-class PropertyListAPIView(APIView):
+class PropertyListFilteredAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):

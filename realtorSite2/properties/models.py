@@ -33,3 +33,15 @@ class Property(models.Model):
     @classmethod
     def get_specific_property(cls, id):
         return cls.objects.filter(id=id).first()
+
+
+
+class PropertyImage(models.Model):
+    property = models.ForeignKey(Property, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='accounts/properties/images/', null=True, blank=True)
+    
+    def __str__(self):
+        return f'Image for {self.property.title}'
+
+    class Meta:
+        verbose_name_plural = 'Property Images'

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from properties.models import Property
+from properties.api.serializer2 import PropertyImageSerializer
 # from users.api.serializers3 import UserSerializer
 
 # from rest_framework import validators
@@ -47,6 +48,7 @@ class PropertySerializer(serializers.Serializer):
     
     
 class PropertyModelSerializerPost(serializers.ModelSerializer):
+    images = PropertyImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Property
@@ -54,6 +56,7 @@ class PropertyModelSerializerPost(serializers.ModelSerializer):
     
     
 class FavoritePropertyModelSerializer(serializers.ModelSerializer):
+    images = PropertyImageSerializer(many=True, read_only=True)
     
     class Meta:
         model = Property
