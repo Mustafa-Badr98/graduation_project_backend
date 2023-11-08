@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'properties.apps.PropertiesConfig',
     'container.apps.ContainerConfig',
     'users.apps.UsersConfig',
+    'django_cleanup.apps.CleanupConfig',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
