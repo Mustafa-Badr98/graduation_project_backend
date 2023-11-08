@@ -1,8 +1,8 @@
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from properties.models import Property
-from properties.api.serializers import PropertySerializer,PropertyModelSerializerPost
+from properties.models import Property, PropertyImage
+from properties.api.serializers import PropertySerializer, PropertyModelSerializerPost
 from properties.api.serializer2 import PropertyModelSerializerGet
 from users.models import NewUser
 from rest_framework import permissions, status
@@ -13,23 +13,47 @@ from rest_framework.views import APIView
 from properties.filters import PropertyFilter
 from urllib.parse import quote
 
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def addPropertyImage(request):
+
+    if request.method == 'POST':
+        property = Property.objects.get(id=45)
+        print(request.FILES.get("image"))
+        PropertyImage.objects.create(
+            property=property, image=request.FILES.get("image"))
+        # property.images.add()
+        # serialized_properties = PropertyModelSerializerGet(properties, many=True)
+        return Response({'ok'})
+
+
 @api_view(['GET', 'POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def postAd(request):
 
     if request.method == 'POST':
-        user=request.user
-        print(user)
+        user = request.user
+        # print(user)
+        print(request.FILES)
         serialized_property = PropertyModelSerializerPost(data=request.data)
         if serialized_property.is_valid():
             serialized_property.validated_data['seller'] = user
-            print(serialized_property.validated_data)
-            
-            serialized_property.save()
+            property_instance = serialized_property.save()
+            # print(property_instance.id)
+            created_property = Property.objects.get(id=property_instance.id)
+            # print(created_property)
+
+            images_data = request.FILES.getlist('images')
+            print(images_data)
+            for image_data in images_data:
+                PropertyImage.objects.create(
+                    property=created_property, image=image_data)
+
+            # print(property_instance.images.all())
             return Response({'properties': serialized_property.data}, status=201)
         return Response({'errors': serialized_property.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @api_view(['GET'])
@@ -38,9 +62,9 @@ def index(request):
 
     if request.method == 'GET':
         properties = Property.get_all_properties()
-        serialized_properties = PropertyModelSerializerGet(properties, many=True)
+        serialized_properties = PropertyModelSerializerGet(
+            properties, many=True)
         return Response({'properties': serialized_properties.data})
-
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -69,7 +93,6 @@ def property_resource(request, id):
                         status=status.HTTP_205_RESET_CONTENT)
 
 
-
 class PropertyListFilteredAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -77,9 +100,10 @@ class PropertyListFilteredAPIView(APIView):
         queryset = Property.objects.all()
 
         print(request.query_params)
-        
-        filtered_queryset = PropertyFilter(request.query_params, queryset=queryset).qs
+
+        filtered_queryset = PropertyFilter(
+            request.query_params, queryset=queryset).qs
         print(filtered_queryset.query)
         # print(request.query_params)
-        serializer = PropertySerializer(filtered_queryset, many=True)
+        serializer = PropertyModelSerializerGet(filtered_queryset, many=True)
         return Response(serializer.data)

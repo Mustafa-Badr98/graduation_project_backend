@@ -5,7 +5,7 @@ from rest_framework import validators
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 # from favorites.api.serializers import FavoriteSerializer
-from properties.api.serializers import FavoritePropertyModelSerializer
+from properties.api.serializers import FavoritePropertyModelSerializer,PropertyModelSerializerPost
 from ratings.api.serializers import RatingSerializer
 from django.db.models import Avg
 
@@ -22,7 +22,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user_obj = NewUser.objects.create_user(
             email=clean_data['email'], password=clean_data['password'], user_name=clean_data['user_name'])
         user_obj.mobile_phone = clean_data['mobile_phone']
-        user_obj.mobile_phone = clean_data['mobile_phone']
+        user_obj.location = clean_data['location']
         user_obj.save()
         return user_obj
 
@@ -44,6 +44,9 @@ class UserSerializer(serializers.ModelSerializer):
     favorites = FavoritePropertyModelSerializer(many=True, read_only=True)
     avg_rating = serializers.SerializerMethodField()
     num_ratings = serializers.SerializerMethodField()
+    properties_owned = PropertyModelSerializerPost(many=True, read_only=True, source='propertiesForSeller')
+
+
 
     class Meta:
         model = NewUser
@@ -59,6 +62,7 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name',
             'mobile_phone',
             'profile_pic',
+            'properties_owned',
         )
 
     def get_avg_rating(self, obj):

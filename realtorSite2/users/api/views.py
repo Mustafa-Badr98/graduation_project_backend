@@ -63,6 +63,22 @@ def UsersIndex(request):
         return Response({"message": "This Method is Not Allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
+
+
+
+class UserReg(APIView):
+        permission_classes = (permissions.AllowAny,)
+        authentication_classes = ()
+        def post(self, request):
+            serialized_user = UserRegisterSerializer(data=request.data)
+            if serialized_user.is_valid():
+                print(serialized_user.validated_data)   
+                serialized_user.save()
+                return Response({'user': serialized_user.data}, status=status.HTTP_201_CREATED)
+            return Response({'errors': serialized_user.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 class UserLogin2(APIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = ()
@@ -79,60 +95,6 @@ class UserLogin2(APIView):
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-
-
-
-
-class UserReg(APIView):
-        permission_classes = (permissions.AllowAny,)
-        authentication_classes = ()
-        def post(self, request):
-            serialized_user = UserRegisterSerializer(data=request.data)
-            if serialized_user.is_valid():
-                print(serialized_user.validated_data)   
-                serialized_user.save()
-                return Response({'user': serialized_user.data}, status=201)
-            return Response({'errors': serialized_user.errors}, status=status.HTTP_400_BAD_REQUEST)
-        
-    
-class UserRegister(APIView):
-    permission_classes = (permissions.AllowAny,)
-
-    def post(self, request):
-        clean_data = request.data
-        serializer = UserRegisterSerializer(data=clean_data)
-        if serializer.is_valid(raise_exception=True):
-            print(clean_data)
-            user = serializer.create(clean_data)
-            if user:
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserLogin(APIView):
-    permission_classes = (permissions.AllowAny,)
-    authentication_classes = (SessionAuthentication,)
-
-    def post(self, request):
-        data = request.data
-        serializer = UserLoginSerializer(data=data)
-
-        if serializer.is_valid():
-            user = serializer.check_user(data)
-            print(user)
-            if (user):
-                print("mustafa")
-                login(request, user)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response("no user")
-
-        else:
-            print("hdddddddddddddddddddddsjsjd")
-            return Response({"message": "object not found , please reload the page"},
-                            status=status.HTTP_205_RESET_CONTENT)
-
-
 class UserView(APIView):
 
     authentication_classes = [TokenAuthentication]
@@ -141,6 +103,11 @@ class UserView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+
+
+        
+    
+
 
 
 class UserLogout(APIView):
@@ -219,3 +186,55 @@ class GetUserInSession(APIView):
         print(request.user)
 
         return Response("logout succuss", status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class UserRegister(APIView):
+#     permission_classes = (permissions.AllowAny,)
+
+#     def post(self, request):
+#         clean_data = request.data
+#         serializer = UserRegisterSerializer(data=clean_data)
+#         if serializer.is_valid(raise_exception=True):
+#             print(clean_data)
+#             user = serializer.create(clean_data)
+#             if user:
+#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+# class UserLogin(APIView):
+#     permission_classes = (permissions.AllowAny,)
+#     authentication_classes = (SessionAuthentication,)
+
+#     def post(self, request):
+#         data = request.data
+#         serializer = UserLoginSerializer(data=data)
+
+#         if serializer.is_valid():
+#             user = serializer.check_user(data)
+#             print(user)
+#             if (user):
+#                 print("mustafa")
+#                 login(request, user)
+#                 return Response(serializer.data, status=status.HTTP_200_OK)
+#             else:
+#                 return Response("no user")
+
+#         else:
+#             print("hdddddddddddddddddddddsjsjd")
+#             return Response({"message": "object not found , please reload the page"},
+#                             status=status.HTTP_205_RESET_CONTENT)
+

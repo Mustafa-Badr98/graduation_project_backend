@@ -18,7 +18,7 @@ class Property(models.Model):
     image = models.ImageField(
         upload_to='accounts/properties/images/', max_length=None, null=True, blank=True)
     seller = models.ForeignKey('users.NewUser', verbose_name=(
-        "Seller User"), on_delete=models.CASCADE, null=True, blank=True, related_name='propertySeller')
+        "Seller User"), on_delete=models.CASCADE, null=True, blank=True, related_name='propertiesForSeller')
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)

@@ -5,7 +5,6 @@ from django.utils import timezone
 from datetime import datetime
 
 
-
 class UsersManger(BaseUserManager):
     def create_user(self, email, user_name, password, **other_fields):
         if not email:
@@ -54,15 +53,19 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     mobile_phone = models.IntegerField(null=True)
     profile_pic = models.ImageField(
         upload_to="accounts/profile_pics/", max_length=200, null=True, blank=True)
-    
+
+    location = models.CharField(null=True)
     
     created_at = models.DateTimeField(auto_now_add=True,)
     updated_at = models.DateTimeField(auto_now=True,)
 
-    user_properties = models.ManyToManyField('properties.Property',related_name="user_ads",null=True,blank=True)
-    favorites = models.ManyToManyField('properties.Property', related_name='favorited_by',null=True,blank=True)
-    ratings = models.ManyToManyField('ratings.Rating', related_name='rated_user',null=True,blank=True)
-     
+    user_properties = models.ManyToManyField(
+        'properties.Property', related_name="user_ads", null=True, blank=True)
+    favorites = models.ManyToManyField(
+        'properties.Property', related_name='favorited_by', null=True, blank=True)
+    ratings = models.ManyToManyField(
+        'ratings.Rating', related_name='rated_user', null=True, blank=True)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -81,5 +84,3 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     @classmethod
     def get_specific_user(cls, email):
         return cls.objects.filter(email=email).first()
-
-
