@@ -4,7 +4,7 @@ from rest_framework import status
 from ratings.models import Rating
 from users.models import NewUser
 from users.api.serializers import UserSerializer
-from django.contrib.auth import get_user_model, login, logout,authenticate
+from django.contrib.auth import get_user_model, login, logout, authenticate
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -23,8 +23,7 @@ from rest_framework.permissions import AllowAny
 def RatingIndex(request):
 
     if request.method == 'GET':
-        user=NewUser.objects.get(id=11)
-               
+        user = NewUser.objects.get(id=11)
 
         # Create a new rating instance
         rating_data = {
@@ -38,10 +37,8 @@ def RatingIndex(request):
 
         # Optionally, you can update the user's ratings field
         user.ratings.add(rating)
-        
+
         return Response({'users'}, status=status.HTTP_200_OK)
-
-
 
 
 @api_view(['GET', 'POST'])
@@ -59,28 +56,28 @@ def UsersIndex(request):
 
         users = NewUser.get_all_users()
         serialized_users = UserSerializer(users, many=True)
-        
+
         return Response({'users': serialized_users.data}, status=status.HTTP_200_OK)
 
     else:
         return Response({"message": "This Method is Not Allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-
-
-
 class UserLogin2(APIView):
     permission_classes = (permissions.AllowAny,)
     authentication_classes = ()
+
     def post(self, request):
         data = request.data
         user = authenticate(username=data['email'], password=data['password'])
         if user is not None:
             login(request, user)
+            print(request.user)
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 class UserRegister(APIView):
     permission_classes = (permissions.AllowAny,)
@@ -131,24 +128,16 @@ class UserView(APIView):
 
 
 class UserLogout(APIView):
-	permission_classes = (permissions.AllowAny,)
-	authentication_classes = ()
-	def post(self, request):
-		logout(request)
-		return Response("logout succuss",status=status.HTTP_200_OK)
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
-
-
-
-
-
-
-
-
-
-
-
-
+    def post(self, request):
+        token = request.headers.get('Authorization', '').split(' ')[1]
+        user_token = Token.objects.get(key=token)
+        user_token.delete()
+ 
+        logout(request)
+        return Response("logout succuss", status=status.HTTP_200_OK)
 
 
 # @api_view(['GET', 'PUT', 'DELETE'])
@@ -177,11 +166,10 @@ class UserLogout(APIView):
 #                         status=status.HTTP_205_RESET_CONTENT)
 
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_user_by_email(request, email):
-    
+
     user = NewUser.get_specific_user(email)
     if user and request.method == 'GET':
         serialized_user = UserSerializer(user)
@@ -190,3 +178,28 @@ def get_user_by_email(request, email):
     else:
         return Response({"message": "object not found , please reload the page"},
                         status=status.HTTP_205_RESET_CONTENT)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_by_token(request, token):
+    print(token)
+    user_token = Token.objects.get(key=token)
+    print(user_token.user)
+    if user_token and request.method == 'GET':
+        serialized_user = UserSerializer(user_token.user)
+        return Response({'data': serialized_user.data}, status=status.HTTP_200_OK)
+
+    else:
+        return Response({"message": "object not found , please reload the page"},
+                        status=status.HTTP_205_RESET_CONTENT)
+
+
+class GetUserInSession(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        print(request.user)
+
+        return Response("logout succuss", status=status.HTTP_200_OK)
