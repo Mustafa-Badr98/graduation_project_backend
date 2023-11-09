@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.views import APIView
 from properties.filters import PropertyFilter
 from urllib.parse import quote
+from django.core.exceptions import ObjectDoesNotExist
 
 
 @api_view(['POST'])
@@ -72,11 +73,28 @@ def index(request):
 @permission_classes([AllowAny])
 def property_resource(request, id):
     property = Property.get_specific_property(id)
+    print(property)
     if property and request.method == 'PUT':
         serialized_property = PropertyModelSerializerPost(
             data=request.data, instance=property)
         if serialized_property.is_valid():
             serialized_property.save()
+
+            property = Property.get_specific_property(id)
+
+            try:
+                existing_images = PropertyImage.objects.filter(
+                    property=property)
+                existing_images.delete()
+            except ObjectDoesNotExist:
+                pass  # No existing images, do nothing
+
+            images_data = request.FILES.getlist('images')
+            print(images_data)
+            for image_data in images_data:
+                PropertyImage.objects.create(
+                    property=property, image=image_data)
+
             return Response({'property': serialized_property.data}, status=200)
         return Response({'errors': serialized_property.errors}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -137,11 +155,10 @@ class UserAddFavAd(APIView):
             # print(request.user.favorites.all())
             serialized_user = UserSerializer(user)
             return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
-            
+
         else:
             return Response({"message": "Object not found. Please reload the page."},
                             status=status.HTTP_205_RESET_CONTENT)
-
 
 
 class UserRemFavAd(APIView):
@@ -160,7 +177,7 @@ class UserRemFavAd(APIView):
             # print(request.user.favorites.all())
             serialized_user = UserSerializer(user)
             return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
-            
+
         else:
             return Response({"message": "Object not found. Please reload the page."},
                             status=status.HTTP_205_RESET_CONTENT)
