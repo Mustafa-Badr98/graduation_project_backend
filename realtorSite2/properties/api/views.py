@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from properties.models import Property, PropertyImage
 from properties.api.serializers import PropertySerializer, PropertyModelSerializerPost
+from users.api.serializers import UserSerializer
 from properties.api.serializer2 import PropertyModelSerializerGet
 from users.models import NewUser
 from rest_framework import permissions, status
@@ -107,3 +108,59 @@ class PropertyListFilteredAPIView(APIView):
         # print(request.query_params)
         serializer = PropertyModelSerializerGet(filtered_queryset, many=True)
         return Response(serializer.data)
+
+
+class IndexProperty(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+
+        properties = Property.get_all_properties()
+        serialized_properties = PropertyModelSerializerGet(
+            properties, many=True)
+        return Response({'properties': serialized_properties.data})
+
+
+class UserAddFavAd(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, id):
+        property = Property.get_specific_property(id)
+
+        if property:
+            user = request.user
+            user.favorites.add(property)
+            user.save()
+            # print(user)
+            # print(request.user.favorites.all())
+            serialized_user = UserSerializer(user)
+            return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"message": "Object not found. Please reload the page."},
+                            status=status.HTTP_205_RESET_CONTENT)
+
+
+
+class UserRemFavAd(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, id):
+        property = Property.get_specific_property(id)
+
+        if property:
+            user = request.user
+            user.favorites.remove(property)
+            user.save()
+            # print(user)
+            # print(request.user.favorites.all())
+            serialized_user = UserSerializer(user)
+            return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
+            
+        else:
+            return Response({"message": "Object not found. Please reload the page."},
+                            status=status.HTTP_205_RESET_CONTENT)
