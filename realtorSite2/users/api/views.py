@@ -63,20 +63,17 @@ def UsersIndex(request):
         return Response({"message": "This Method is Not Allowed."}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-
-
-
 class UserReg(APIView):
-        permission_classes = (permissions.AllowAny,)
-        authentication_classes = ()
-        def post(self, request):
-            serialized_user = UserRegisterSerializer(data=request.data)
-            if serialized_user.is_valid():
-                print(serialized_user.validated_data)   
-                serialized_user.save()
-                return Response({'user': serialized_user.data}, status=status.HTTP_201_CREATED)
-            return Response({'errors': serialized_user.errors}, status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
 
+    def post(self, request):
+        serialized_user = UserRegisterSerializer(data=request.data)
+        if serialized_user.is_valid():
+            print(serialized_user.validated_data)
+            serialized_user.save()
+            return Response({'user': serialized_user.data}, status=status.HTTP_201_CREATED)
+        return Response({'errors': serialized_user.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogin2(APIView):
@@ -105,11 +102,6 @@ class UserView(APIView):
         return Response({'user': serializer.data}, status=status.HTTP_200_OK)
 
 
-        
-    
-
-
-
 class UserLogout(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
@@ -118,10 +110,43 @@ class UserLogout(APIView):
         token = request.headers.get('Authorization', '').split(' ')[1]
         user_token = Token.objects.get(key=token)
         user_token.delete()
- 
+
         logout(request)
         return Response("logout succuss", status=status.HTTP_200_OK)
 
+
+class EditUserView(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        serialized_user = UserSerializer(data=request.data, instance=user)
+        if serialized_user.is_valid():
+
+            serialized_user.save()
+            user.set_password(request.data.get("password"))
+            user.save()
+
+        return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
+
+
+class DeleteUserView(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request):
+        print(request.user)
+        user = request.user
+        token = request.headers.get('Authorization', '').split(' ')[1]
+        user_token = Token.objects.get(key=token)
+        print(user_token)
+        user_token.delete()
+        user.delete()
+
+        return Response({'message': "user deleted."}, status=status.HTTP_200_OK)
 
 # @api_view(['GET', 'PUT', 'DELETE'])
 # @permission_classes([AllowAny])
@@ -188,19 +213,6 @@ class GetUserInSession(APIView):
         return Response("logout succuss", status=status.HTTP_200_OK)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 # class UserRegister(APIView):
 #     permission_classes = (permissions.AllowAny,)
 
@@ -237,4 +249,3 @@ class GetUserInSession(APIView):
 #             print("hdddddddddddddddddddddsjsjd")
 #             return Response({"message": "object not found , please reload the page"},
 #                             status=status.HTTP_205_RESET_CONTENT)
-
