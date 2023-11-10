@@ -3,9 +3,9 @@ from users.models import NewUser
 # Create your models here.
 
 class Comment(models.Model):
-    user = models.ForeignKey(NewUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(NewUser, related_name='comments_on_user',on_delete=models.CASCADE)
     commented_by = models.ForeignKey(
-        NewUser, related_name='comments_given', on_delete=models.CASCADE)
+        NewUser, related_name='comments_given_by_user', on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

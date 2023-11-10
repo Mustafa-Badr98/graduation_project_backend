@@ -9,7 +9,7 @@ from properties.api.serializers import FavoritePropertyModelSerializer, Property
 from deals.api.serializers import DealSerializer
 from ratings.api.serializers import RatingSerializer
 from django.db.models import Avg
-
+from comments.api.serializers import CommentSerializer
 
 # UserModel = get_user_model()
 
@@ -51,6 +51,9 @@ class UserSerializer(serializers.ModelSerializer):
     deals_bought = DealSerializer(
         many=True, read_only=True, source='DealBuyer')
 
+    comments = CommentSerializer(
+        many=True, read_only=True, source="comments_on_user")
+
     class Meta:
         model = NewUser
         fields = (
@@ -68,6 +71,7 @@ class UserSerializer(serializers.ModelSerializer):
             'properties_owned',
             'deals_sold',
             'deals_bought',
+            'comments',
         )
 
     def get_avg_rating(self, obj):

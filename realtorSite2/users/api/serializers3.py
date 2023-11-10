@@ -5,8 +5,9 @@ from rest_framework import serializers
 from properties.api.serializers import FavoritePropertyModelSerializer
 from django.db.models import Avg
 
-      
+
 class UserSerializer(serializers.ModelSerializer):
+
     favorites = FavoritePropertyModelSerializer(many=True, read_only=True)
     avg_rating = serializers.SerializerMethodField()
     num_ratings = serializers.SerializerMethodField()
@@ -34,3 +35,16 @@ class UserSerializer(serializers.ModelSerializer):
     def get_num_ratings(self, obj):
         num_ratings = obj.ratings.count()
         return num_ratings
+
+
+class UserCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewUser
+        fields = (
+            'id',
+            'email',
+            'user_name',
+            'mobile_phone',
+            'profile_pic',
+
+        )
