@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from properties.models import Property
 from properties.api.serializer2 import PropertyImageSerializer
+from offers.api.serializers import OfferSerializer 
 # from users.api.serializers3 import UserSerializer
 
 # from rest_framework import validators
@@ -18,12 +19,15 @@ class PropertySerializer(serializers.Serializer):
     lon=serializers.FloatField(required=False)    
     number_of_bedrooms=serializers.IntegerField(required=False)
     number_of_bathrooms=serializers.IntegerField(required=False)
-    image= serializers.ImageField(required=False)
-  
+    image= serializers.ImageField(required=False)  
     
     
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
+
+
+    offers = OfferSerializer(many=True, read_only=True, source='offer_property')
+
 
 
     def create(self, validated_data):
@@ -44,6 +48,12 @@ class PropertySerializer(serializers.Serializer):
         instance.lon = validated_data['lon']
         instance.save()
         return  instance
+    
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['offers'] = OfferSerializer(instance.offers.all(), many=True).data
+        return representation
     
     
     
