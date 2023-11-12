@@ -52,7 +52,7 @@ class UserSerializer(serializers.ModelSerializer):
         many=True, read_only=True, source='DealBuyer')
 
     comments = CommentSerializer(
-        many=True, read_only=True, source="comments_on_user")
+        many=True, read_only=True, source="comments_on_user",)
 
     class Meta:
         model = NewUser
