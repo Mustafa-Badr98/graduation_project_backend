@@ -23,10 +23,6 @@ class AddComment(APIView):
             user2 = request.user
             content = request.data.get("content")
 
-            # print(user)
-            # print(user2)
-            # print(content)
-
             comment_data = {
                 'user': user,
                 'commented_by': user2,
@@ -44,3 +40,30 @@ class AddComment(APIView):
 
         except:
             return Response({'you have commented before'}, status=status.HTTP_200_OK)
+
+
+class DeleteComment(APIView):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, comment_id):
+
+        comment = Comment.objects.get(id=comment_id)
+        print(comment)
+        comment.delete()
+
+        return Response({'message': "delete comment done"}, status=status.HTTP_200_OK)
+
+
+# class EditComment(APIView):
+
+#     authentication_classes = [TokenAuthentication]
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def put(self, request, comment_id):
+#         comment = Comment.objects.get(id=comment_id)
+#         print(comment)
+#         comment.delete()
+
+#         return Response({'message': "delete comment done"}, status=status.HTTP_200_OK)
