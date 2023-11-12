@@ -26,7 +26,7 @@ class PropertySerializer(serializers.Serializer):
     updated_at = serializers.DateTimeField(read_only=True)
 
 
-    offers = OfferSerializer(many=True, read_only=True)
+    offers = OfferSerializer(many=True, read_only=True, source='offer_property')
 
 
 
