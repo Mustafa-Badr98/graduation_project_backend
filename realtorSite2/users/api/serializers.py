@@ -6,6 +6,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 # from favorites.api.serializers import FavoriteSerializer
 from properties.api.serializers import FavoritePropertyModelSerializer, PropertyModelSerializerPost
+from properties.api.serializer2 import PropertyModelSerializerGet
 from deals.api.serializers import DealSerializer
 from ratings.api.serializers import RatingSerializer
 from django.db.models import Avg
@@ -45,7 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
     favorites = FavoritePropertyModelSerializer(many=True, read_only=True)
     avg_rating = serializers.SerializerMethodField()
     num_ratings = serializers.SerializerMethodField()
-    properties_owned = PropertyModelSerializerPost(
+    properties_owned = PropertyModelSerializerGet(
         many=True, read_only=True, source='propertiesForSeller')
     deals_sold = DealSerializer(many=True, read_only=True, source='DealSeller')
     deals_bought = DealSerializer(

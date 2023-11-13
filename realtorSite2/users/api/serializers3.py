@@ -1,7 +1,6 @@
 
 from rest_framework import serializers
 from users.models import NewUser
-from rest_framework import serializers
 from properties.api.serializers import FavoritePropertyModelSerializer
 from django.db.models import Avg
 
@@ -48,3 +47,5 @@ class UserCommentSerializer(serializers.ModelSerializer):
             'profile_pic',
 
         )
+
+
