@@ -6,7 +6,7 @@ from users.models import NewUser
 class Property(models.Model):
 
     title = models.CharField(max_length=50, null=False)
-    description = models.CharField(max_length=200, null=True, blank=True)
+    description = models.CharField(max_length=1200, null=True, blank=True)
     area_size = models.IntegerField(null=True)
     price = models.FloatField(max_length=100, null=False)
     location = models.CharField(max_length=50, null=True)

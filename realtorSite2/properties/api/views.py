@@ -63,7 +63,7 @@ def postAd(request):
 def index(request):
 
     if request.method == 'GET':
-        properties = Property.get_all_properties()
+        properties = Property.get_live_properties()
         serialized_properties = PropertyModelSerializerGet(
             properties, many=True)
         return Response({'properties': serialized_properties.data})
