@@ -185,3 +185,13 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_HEADER_NAME = "X-CSRFToken"
+
+
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'mustafa.rm.badr@gmail.com'
+EMAIL_HOST_PASSWORD = 'whobhwlapwdnigcv'

@@ -23,8 +23,19 @@ class Property(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
 
+    offers = models.ManyToManyField(
+        'offers.Offer', blank=True, null=True, related_name='property_offers')
 
-    offers = models.ManyToManyField('offers.Offer', blank=True, null=True,related_name='property_offers')
+    STATE_CHOICES = [
+        ('live', 'Live'),
+        ('sold', 'Sold'),
+    ]
+
+    state = models.CharField(
+        max_length=4,
+        choices=STATE_CHOICES,
+        default='live',  # Set the default state to 'live'
+    )
 
     def __str__(self):
         return f'{self.title} BY {self.seller}'
@@ -37,12 +48,21 @@ class Property(models.Model):
     def get_specific_property(cls, id):
         return cls.objects.filter(id=id).first()
 
+    @classmethod
+    def get_live_properties(cls):
+        return cls.objects.filter(state='live')
+
+    @classmethod
+    def get_sold_properties(cls):
+        return cls.objects.filter(state='sold')
 
 
 class PropertyImage(models.Model):
-    property = models.ForeignKey(Property, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='accounts/properties/images/', null=True, blank=True)
-    
+    property = models.ForeignKey(
+        Property, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(
+        upload_to='accounts/properties/images/', null=True, blank=True)
+
     def __str__(self):
         return f'Image for {self.property.title}'
 

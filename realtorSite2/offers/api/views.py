@@ -9,6 +9,7 @@ from rest_framework.authentication import TokenAuthentication
 from properties.models import Property
 from deals.models import Deal
 from deals.api.serializers import DealSerializer
+from django.core.mail import send_mail
 
 
 class OfferList(generics.ListCreateAPIView):
@@ -94,5 +95,21 @@ class AcceptPropertyOffersAPIView(APIView):
 
         deal = Deal.objects.create(**deal_data)
         serialized_deal = DealSerializer(deal)
+
+        subject = 'About your Offer'
+        message = (
+            f"Dear User {accepted_offer.user.user_name},\n\n"
+            "Congratulations! We are delighted to inform you that your offer has been accepted, "
+            "and the deal is now complete. This is a significant milestone, and we appreciate your "
+            "engagement throughout the process.\n\n"
+            "If you have any questions or need further assistance, feel free to reach out. "
+            "Thank you for choosing our platform.\n\n"
+            "Best regards,\nThe [Your Company] Team"
+        )
+        from_email = 'mustafa.rm.badr@gmail.com'
+        recipient_list = ['mustafabadrwork1998@gmail.com']
+
+        send_mail(subject, message, from_email,
+                  recipient_list, fail_silently=False)
 
         return Response({"deal": serialized_deal.data}, status=200)
