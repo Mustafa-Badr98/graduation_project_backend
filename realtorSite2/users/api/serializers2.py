@@ -5,7 +5,14 @@ class SellerSerializer(serializers.ModelSerializer):
        class Meta:
 
         model = NewUser
-        fields = '__all__'        
+        fields = (
+            'id',
+            'email',
+            'user_name',
+            'mobile_phone',
+            'profile_pic',
+            'is_admin',
+        )     
 
 
    

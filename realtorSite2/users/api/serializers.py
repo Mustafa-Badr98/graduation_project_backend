@@ -55,6 +55,7 @@ class UserSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(
         many=True, read_only=True, source="comments_on_user",)
 
+    ratings = RatingSerializer(many=True)
     class Meta:
         model = NewUser
         fields = (
@@ -70,6 +71,8 @@ class UserSerializer(serializers.ModelSerializer):
             'deals_sold',
             'deals_bought',
             'comments',
+            'is_admin',
+            'ratings',
         )
 
     def get_avg_rating(self, obj):

@@ -68,7 +68,9 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    
     REQUIRED_FIELDS = ['user_name', 'mobile_phone']
     USERNAME_FIELD = 'email'
 

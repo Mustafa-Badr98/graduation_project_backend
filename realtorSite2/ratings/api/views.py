@@ -6,9 +6,7 @@ from users.models import NewUser
 from ratings.models import Rating
 from rest_framework import status
 from rest_framework.response import Response
-
-
-
+from django.db.models import Q
 
 
 @api_view(['POST'])
@@ -17,22 +15,33 @@ def userRating(request):
 
     if request.method == 'POST':
         try:
-            user=NewUser.objects.get(id=11)
-            user2=NewUser.objects.get(id=14)
-                
-            rating_data = {
-                'user': user,
-                'rated_by': user2,  # You may set this to a specific user or keep it as None
-                'rating': 2
-            }
+            user = NewUser.objects.get(id=request.data.get('user_id'))
+            rated_by = NewUser.objects.get(id=request.data.get('rated_by_id'))
+            rate = request.data.get('rate')
+            existing_rating = Rating.objects.filter(
+                Q(user=user) & Q(rated_by=rated_by)
+            ).first()
 
-            
-            rating = Rating.objects.create(**rating_data)
+            if existing_rating:
+                # Update the existing rating
+                print(existing_rating.rating)
+                existing_rating.rating = rate
+                existing_rating.save()
+                print(existing_rating.rating)
 
-            # Optionally, you can update the user's ratings field
-            user.ratings.add(rating)
-            
-            return Response({'users'}, status=status.HTTP_200_OK)
+            else:
+                # Create a new rating
+                rating_data = {
+                    'user': user,
+                    'rated_by': rated_by,
+                    'rating': rate
+                }
+                rating = Rating.objects.create(**rating_data)
+
+                # Optionally, you can update the user's ratings field
+                user.ratings.add(rating)
+
+            return Response({'Rating Created'}, status=status.HTTP_200_OK)
 
         except:
             return Response({'you have rated before'}, status=status.HTTP_200_OK)
