@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model, login, logout, authenticate
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer,UserEditSerializer
+from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer, UserEditSerializer
 from rest_framework import permissions, status
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -16,6 +16,7 @@ from ratings.api.serializers import RatingSerializer
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from users.filters import UsersFilter
 
 
 @api_view(['GET'])
@@ -129,7 +130,7 @@ class EditUserView(APIView):
             serialized_user.save()
             user.set_password(request.data.get("password"))
             user.save()
- 
+
             return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
         else:
             return Response({'errors': serialized_user.errors}, status=status.HTTP_400_BAD_REQUEST)
@@ -151,30 +152,32 @@ class DeleteUserView(APIView):
 
         return Response({'message': "user deleted."}, status=status.HTTP_200_OK)
 
-# @api_view(['GET', 'PUT', 'DELETE'])
-# @permission_classes([AllowAny])
-# def property_resource(request, id):
-#     property = Property.get_specific_property(id)
-#     if property and request.method == 'PUT':
-#         serialized_property = PropertyModelSerializerPost(
-#             data=request.data, instance=property)
-#         if serialized_property.is_valid():
-#             serialized_property.save()
-#             return Response({'property': serialized_property.data}, status=200)
-#         return Response({'errors': serialized_property.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-#     elif property and request.method == 'DELETE':
-#         property.delete()
-#         return Response({"message": "Deleted Successfully! "},
-#                         status=status.HTTP_204_NO_CONTENT)
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([AllowAny])
+def user_resource(request, id):
+    user = NewUser.objects.get(id=id)
+    print(user)
+    if user and request.method == 'PUT':
+        serialized_user = UserEditSerializer(data=request.data, instance=user)
+        if serialized_user.is_valid():
+            serialized_user.save()
+            return Response({'user': serialized_user.data}, status=200)
+        return Response({'errors': serialized_user.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-#     elif property and request.method == 'GET':
-#         serialized_property = PropertyModelSerializerGet(property)
-#         return Response({'data': serialized_property.data}, status=status.HTTP_200_OK)
+    elif user and request.method == 'DELETE':
+        print(user)
+        user.delete()
+        return Response("Deleted Successfully! ",
+                        status=status.HTTP_204_NO_CONTENT)
 
-#     else:
-#         return Response({"message": "object not found , please reload the page"},
-#                         status=status.HTTP_205_RESET_CONTENT)
+    elif user and request.method == 'GET':
+        serialized_user = UserSerializer(user)
+        return Response({'data': serialized_user.data}, status=status.HTTP_200_OK)
+
+    else:
+        return Response({"message": "object not found , please reload the page"},
+                        status=status.HTTP_205_RESET_CONTENT)
 
 
 @api_view(['GET'])
@@ -252,3 +255,19 @@ class GetUserInSession(APIView):
 #             print("hdddddddddddddddddddddsjsjd")
 #             return Response({"message": "object not found , please reload the page"},
 #                             status=status.HTTP_205_RESET_CONTENT)
+
+
+class UserListFilteredAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        queryset = NewUser.objects.all()
+
+        print(request.query_params)
+
+        filtered_queryset = UsersFilter(
+            request.query_params, queryset=queryset).qs
+        print(filtered_queryset.query)
+        # print(request.query_params)
+        serializer = UserSerializer(filtered_queryset, many=True)
+        return Response(serializer.data)
