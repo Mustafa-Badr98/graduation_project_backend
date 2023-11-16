@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model, login, logout, authenticate
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer
+from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer,UserEditSerializer
 from rest_framework import permissions, status
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -122,14 +122,17 @@ class EditUserView(APIView):
 
     def put(self, request):
         user = request.user
-        serialized_user = UserSerializer(data=request.data, instance=user)
+        print(request.data)
+        serialized_user = UserEditSerializer(data=request.data, instance=user)
         if serialized_user.is_valid():
-
+            print("valid")
             serialized_user.save()
             user.set_password(request.data.get("password"))
             user.save()
-
-        return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
+ 
+            return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'errors': serialized_user.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DeleteUserView(APIView):

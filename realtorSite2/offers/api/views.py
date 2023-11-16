@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from properties.models import Property
+from users.models import NewUser
 from deals.models import Deal
 from deals.api.serializers import DealSerializer
 from django.core.mail import send_mail
@@ -94,6 +95,21 @@ class AcceptPropertyOffersAPIView(APIView):
         }
 
         deal = Deal.objects.create(**deal_data)
+
+        sold_property = accepted_offer.property
+        sold_property.state = "sold"
+        sold_property.save()
+
+        all_other_offers = Offer.objects.filter(property=sold_property)
+        all_other_offers.delete()
+
+        users_favoriting_property = NewUser.objects.filter(
+            favorites=sold_property)
+        print(f'users are  : {users_favoriting_property}')
+
+        for user in users_favoriting_property:
+            user.favorites.remove(sold_property)
+
         serialized_deal = DealSerializer(deal)
 
         subject = 'About your Offer'

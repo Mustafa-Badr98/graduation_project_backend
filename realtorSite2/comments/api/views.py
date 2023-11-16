@@ -11,6 +11,17 @@ from rest_framework.authentication import TokenAuthentication
 from comments.api.serializers import CommentSerializer
 
 
+class CommentIndex(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+
+        comments = Comment.objects.all()
+        serialized_comments = CommentSerializer(
+            comments, many=True)
+        return Response({'comments': serialized_comments.data})
+
+
 class AddComment(APIView):
 
     authentication_classes = [TokenAuthentication]

@@ -1,12 +1,24 @@
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-
+from rest_framework.views import APIView
 from users.models import NewUser
 from ratings.models import Rating
 from rest_framework import status
 from rest_framework.response import Response
 from django.db.models import Q
+from ratings.api.serializers import RatingSerializer
+
+
+class RatingIndex(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+
+        ratings = Rating.objects.all()
+        serialized_ratings = RatingSerializer(
+            ratings, many=True)
+        return Response({'ratings': serialized_ratings.data})
 
 
 @api_view(['POST'])

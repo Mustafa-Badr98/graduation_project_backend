@@ -15,6 +15,12 @@ from comments.api.serializers import CommentSerializer
 # UserModel = get_user_model()
 
 
+class UserEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewUser
+        fields = '__all__'
+
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewUser
@@ -56,6 +62,7 @@ class UserSerializer(serializers.ModelSerializer):
         many=True, read_only=True, source="comments_on_user",)
 
     ratings = RatingSerializer(many=True)
+
     class Meta:
         model = NewUser
         fields = (

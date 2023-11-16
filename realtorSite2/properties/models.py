@@ -50,7 +50,7 @@ class Property(models.Model):
 
     @classmethod
     def get_live_properties(cls):
-        return cls.objects.filter(state='live')
+        return cls.objects.filter(state='live').order_by('-created_at')
 
     @classmethod
     def get_sold_properties(cls):
