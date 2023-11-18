@@ -19,3 +19,20 @@ class PropertyFilter(FilterSet):
             'number_of_bedrooms': ['exact', 'icontains', 'lt', 'gt', 'gte', 'lte'],
             'type': ['icontains',],
         }
+
+
+class PropertySearchFilter(FilterSet):
+    class Meta:
+
+        # area_size = RangeFilter()
+        # number_of_bathrooms = RangeFilter()
+        # number_of_bedrooms = RangeFilter()
+
+        model = Property
+        fields = {
+            'title': ['exact', 'icontains'],
+            'id': ['exact', 'icontains'],
+            'price': ['exact', 'icontains'],
+            'location': ['exact', 'icontains'],
+            'type': ['icontains',],
+        }

@@ -67,6 +67,18 @@ class DeleteComment(APIView):
         return Response({'message': "delete comment done"}, status=status.HTTP_200_OK)
 
 
+class AdminDeleteComment(APIView):
+    permission_classes = [AllowAny]
+
+    def delete(self, request, comment_id):
+
+        comment = Comment.objects.get(id=comment_id)
+        print(comment)
+        comment.delete()
+
+        return Response({'message': "delete comment done"}, status=status.HTTP_200_OK)
+
+
 # class EditComment(APIView):
 
 #     authentication_classes = [TokenAuthentication]

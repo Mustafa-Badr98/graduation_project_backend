@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.views import APIView
-from properties.filters import PropertyFilter
+from properties.filters import PropertyFilter,PropertySearchFilter
 from urllib.parse import quote
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -99,6 +99,7 @@ def property_resource(request, id):
         return Response({'errors': serialized_property.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     elif property and request.method == 'DELETE':
+      
         property.delete()
         return Response({"message": "Deleted Successfully! "},
                         status=status.HTTP_204_NO_CONTENT)
@@ -116,7 +117,7 @@ class PropertyListFilteredAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        queryset = Property.objects.all()
+        queryset = Property.get_live_properties()
 
         print(request.query_params)
 
@@ -139,6 +140,32 @@ class IndexProperty(APIView):
         return Response({'properties': serialized_properties.data})
 
 
+class AdminIndexProperty(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+
+        properties = Property.get_all_properties()
+        serialized_properties = PropertyModelSerializerGet(
+            properties, many=True)
+        return Response({'properties': serialized_properties.data})
+    
+    
+class AdminPropertyListFilteredAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        queryset = Property.objects.all()
+
+        print(request.query_params)
+
+        filtered_queryset = PropertySearchFilter(
+            request.query_params, queryset=queryset).qs
+        print(filtered_queryset.query)
+        # print(request.query_params)
+        serializer = PropertyModelSerializerGet(filtered_queryset, many=True)
+        return Response(serializer.data)    
+    
 class UserAddFavAd(APIView):
 
     authentication_classes = [TokenAuthentication]

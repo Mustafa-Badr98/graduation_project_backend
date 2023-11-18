@@ -126,10 +126,12 @@ class EditUserView(APIView):
         print(request.data)
         serialized_user = UserEditSerializer(data=request.data, instance=user)
         if serialized_user.is_valid():
-            print("valid")
+            # print("valid")
             serialized_user.save()
+            # print(request.data.get("password"))
             user.set_password(request.data.get("password"))
             user.save()
+            
 
             return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
         else:
@@ -138,12 +140,13 @@ class EditUserView(APIView):
 
 class DeleteUserView(APIView):
 
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
 
-    def delete(self, request):
-        print(request.user)
-        user = request.user
+    def delete(self, request, id):
+        print(id)
+        user = NewUser.objects.get(id=id)
+        print(user)
         token = request.headers.get('Authorization', '').split(' ')[1]
         user_token = Token.objects.get(key=token)
         print(user_token)
