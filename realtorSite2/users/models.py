@@ -46,8 +46,9 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
         verbose_name='email address',
         max_length=255,
         unique=True,
+        blank=True
     )
-    user_name = models.CharField(max_length=150,)
+    user_name = models.CharField(max_length=150,blank=True)
     first_name = models.CharField(max_length=150, null=True, blank=True)
     last_name = models.CharField(max_length=150, null=True, blank=True)
     mobile_phone = models.IntegerField(null=True)

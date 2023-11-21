@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.db.models import Q
 from ratings.api.serializers import RatingSerializer
+from rest_framework import permissions
 
 
 class RatingIndex(APIView):
@@ -57,3 +58,14 @@ def userRating(request):
 
         except:
             return Response({'you have rated before'}, status=status.HTTP_200_OK)
+
+
+class AdminDeleteRatingAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def delete(self, request, id):
+        rating = Rating.objects.get(id=id)
+        print(rating)
+        rating.delete()
+        return Response('Rating Deleted', status=200)

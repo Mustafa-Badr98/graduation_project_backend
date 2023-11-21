@@ -116,3 +116,18 @@ class UserSerializer(serializers.ModelSerializer):
     #     instance.lon = validated_data['lon']
     #     instance.save()
     #     return  instance
+
+
+class AddAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewUser
+        fields = '__all__'
+
+    def create(self, clean_data):
+        user_obj = NewUser.objects.create_user(
+            email=clean_data['email'], password=clean_data['password'], user_name=clean_data['user_name'])
+        user_obj.mobile_phone = clean_data['mobile_phone']
+        user_obj.location = clean_data['location']
+        user_obj.is_admin = True
+        user_obj.save()
+        return user_obj

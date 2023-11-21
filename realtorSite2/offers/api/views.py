@@ -129,3 +129,14 @@ class AcceptPropertyOffersAPIView(APIView):
                   recipient_list, fail_silently=False)
 
         return Response({"deal": serialized_deal.data}, status=200)
+
+
+class AdminDeleteOffersAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def delete(self, request, id):
+        rejected_offer = Offer.objects.get(id=id)
+        print(rejected_offer)
+        rejected_offer.delete()
+        return Response('Offer Deleted', status=200)

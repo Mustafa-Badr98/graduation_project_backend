@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model, login, logout, authenticate
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer, UserEditSerializer
+from .serializers import UserRegisterSerializer, UserLoginSerializer, UserSerializer, UserEditSerializer, AddAdminSerializer
 from rest_framework import permissions, status
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -55,7 +55,7 @@ def UsersIndex(request):
 
     elif request.method == 'GET':
 
-        users = NewUser.get_all_users()
+        users = NewUser.objects.all().order_by("-created_at")
         serialized_users = UserSerializer(users, many=True)
 
         return Response({'users': serialized_users.data}, status=status.HTTP_200_OK)
@@ -85,7 +85,7 @@ class UserLogin2(APIView):
         data = request.data
         user = authenticate(username=data['email'], password=data['password'])
         if user is not None:
-            login(request, user)
+            # login(request, user)
             print(request.user)
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
@@ -128,10 +128,11 @@ class EditUserView(APIView):
         if serialized_user.is_valid():
             # print("valid")
             serialized_user.save()
-            # print(request.data.get("password"))
+
+            print(request.data.get("password"))
             user.set_password(request.data.get("password"))
+            user.is_active = True
             user.save()
-            
 
             return Response({'user': serialized_user.data}, status=status.HTTP_200_OK)
         else:
@@ -188,6 +189,20 @@ def user_resource(request, id):
 def get_user_by_email(request, email):
 
     user = NewUser.get_specific_user(email)
+    if user and request.method == 'GET':
+        serialized_user = UserSerializer(user)
+        return Response({'data': serialized_user.data}, status=status.HTTP_200_OK)
+
+    else:
+        return Response({"message": "object not found , please reload the page"},
+                        status=status.HTTP_205_RESET_CONTENT)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_by_id(request, id):
+
+    user = NewUser.objects.get(id=id)
     if user and request.method == 'GET':
         serialized_user = UserSerializer(user)
         return Response({'data': serialized_user.data}, status=status.HTTP_200_OK)
@@ -274,3 +289,17 @@ class UserListFilteredAPIView(APIView):
         # print(request.query_params)
         serializer = UserSerializer(filtered_queryset, many=True)
         return Response(serializer.data)
+
+
+class AddAdminUser(APIView):
+    permission_classes = (permissions.AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request):
+        serialized_user = AddAdminSerializer(data=request.data)
+        if serialized_user.is_valid():
+            print(serialized_user.validated_data)
+
+            serialized_user.save()
+            return Response({'user': serialized_user.data}, status=status.HTTP_201_CREATED)
+        return Response({'errors': serialized_user.errors}, status=status.HTTP_400_BAD_REQUEST)

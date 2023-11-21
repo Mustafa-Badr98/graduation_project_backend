@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import OfferList, OfferDetail, AddOfferAPIView, GetPropertyOffersAPIView, RejectPropertyOffersAPIView, AcceptPropertyOffersAPIView
-
+from .views import AdminDeleteOffersAPIView
 urlpatterns = [
     path('offers/', OfferList.as_view(), name='offer_list'),
     path('offers/<int:pk>/', OfferDetail.as_view(), name='offer_detail'),
@@ -11,6 +11,7 @@ urlpatterns = [
          RejectPropertyOffersAPIView.as_view(), name='reject_offer'),
     path('accept_offer/<int:id>',
          AcceptPropertyOffersAPIView.as_view(), name='accept_offer'),
-
+    path('admin_delete_offer/<int:id>',
+         AdminDeleteOffersAPIView.as_view(), name='admin_delete_offer'),
 
 ]
