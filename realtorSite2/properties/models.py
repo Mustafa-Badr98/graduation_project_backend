@@ -42,7 +42,7 @@ class Property(models.Model):
 
     @classmethod
     def get_all_properties(cls):
-        return cls.objects.all()
+        return cls.objects.all().order_by("-created_at")
 
     @classmethod
     def get_specific_property(cls, id):
