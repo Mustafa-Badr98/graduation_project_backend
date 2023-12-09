@@ -92,10 +92,10 @@ WSGI_APPLICATION = 'realtorSite2.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'realtor_aslx',
-        'USER': 'user',
-        'PASSWORD': 'N1bIE45Ig4M9EJXhAcAzhElBTvKeepYK',
-        "HOST": 'postgres://user:N1bIE45Ig4M9EJXhAcAzhElBTvKeepYK@dpg-clor9n9oh6hc73bma1t0-a/realtor_aslx',
+        'NAME': 'realtorsite2',
+        'USER': 'realtor',
+        'PASSWORD': '123',
+        "HOST": 'localhost',
         'PORT': 5432
     }
 }
